@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../model/home.dart';
 import '../service/api_service.dart';
 
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -94,35 +93,33 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: SizedBox(
-                  height: 440,
-                  child: FutureBuilder<List<Location>>(
-                    future: locations,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return const Center(child: Text('No destinations found'));
-                      } else {
-                        return SingleChildScrollView(
-                          child: Column(
-                            children: List.generate(snapshot.data!.length, (index) {
-                              final location = snapshot.data![index];
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 12.0),
-                                child: SizedBox(
-                                  height: 200,
-                                  child: _buildDestinationCard(location),
-                                ),
-                              );
-                            }),
-                          ),
-                        );
-                      }
-                    },
-                  ),
+                child: FutureBuilder<List<Location>>(
+                  future: locations,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(child: Text('No destinations found'));
+                    } else {
+                      return GridView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(), // Disable scrolling inside GridView
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2, // Số cột là 2
+                          crossAxisSpacing: 10, // Khoảng cách giữa các cột
+                          mainAxisSpacing: 10, // Khoảng cách giữa các dòng
+                          childAspectRatio: 0.75, // Tỉ lệ chiều rộng/chiều cao của item
+                        ),
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          final location = snapshot.data![index];
+                          return _buildDestinationCard(location);
+                        },
+                      );
+                    }
+                  },
                 ),
               ),
             ],
